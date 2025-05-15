@@ -7,6 +7,9 @@ const meta: Meta<typeof AudioMeter> = {
     decibels: {
       control: { max: 2, min: -120, step: 0.01, type: "range" },
     },
+    disabled: {
+      control: { type: "boolean" },
+    },
     height: {
       control: { max: 100, min: 5, step: 1, type: "range" },
     },
@@ -34,4 +37,8 @@ export const Vertical: Story = {};
 
 export const Horizontal: Story = {
   args: { orientation: "horizontal" },
+};
+
+export const Disabled: Story = {
+  args: { disabled: true },
 };

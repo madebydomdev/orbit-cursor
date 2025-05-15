@@ -1,3 +1,6 @@
+import { VolumeOffIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { ReactNode } from "react";
 import { VariantProps } from "tailwind-variants";
 
 import { tv } from "../../../../tailwind-merge.config";
@@ -16,18 +19,32 @@ const decibelsToLabel = (decibels: number) => {
   return (Math.round(decibels * 10) / 10).toString();
 };
 
+const decibelsToColor = (decibels: number) => {
+  if (decibels < -20) return "var(--color-success)";
+  if (decibels < -8) return "var(--color-warning)";
+  return "var(--color-error)";
+};
+
 const audioMeterVariants = tv({
   defaultVariants: {
     orientation: "vertical",
   },
   slots: {
     base: "flex items-center",
+    disabledIconContainer:
+      "text-muted absolute inset-0 flex items-center justify-center p-1",
     label: "text-xxs font-semibold",
     meter: "bg-content-fg rounded-sm transition-all",
     meterContainer:
       "flex items-end bg-neutral rounded-sm overflow-hidden relative",
   },
   variants: {
+    disabled: {
+      true: {
+        disabledIconContainer: "text-muted",
+        label: "text-muted",
+      },
+    },
     orientation: {
       horizontal: {
         base: "flex-row-reverse gap-2 w-full",
@@ -42,27 +59,28 @@ const audioMeterVariants = tv({
 
 type AudioMeterProps = VariantProps<typeof audioMeterVariants> & {
   decibels: number;
+  disabledIcon?: ReactNode;
   height?: number | string;
   width?: number | string;
 };
 
 const AudioMeter = ({
-  decibels,
+  decibels: decibelsValue,
+  disabled = false,
+  disabledIcon = <VolumeOffIcon size={20} />,
   height = 40,
   orientation = "vertical",
   width = 40,
 }: AudioMeterProps) => {
-  const { base, label, meter, meterContainer } = audioMeterVariants({
-    orientation,
-  });
+  const { base, disabledIconContainer, label, meter, meterContainer } =
+    audioMeterVariants({
+      disabled,
+      orientation,
+    });
 
-  const color =
-    decibels < -20
-      ? "var(--color-success)"
-      : decibels < -8
-      ? "var(--color-warning)"
-      : "var(--color-error)";
+  const decibels = disabled ? -Infinity : decibelsValue;
 
+  const color = decibelsToColor(decibels);
   const fillPercentage = decibelToPercentage(decibels).toString() + "%";
 
   return (
@@ -76,12 +94,25 @@ const AudioMeter = ({
             width: orientation === "horizontal" ? fillPercentage : "100%",
           }}
         />
+
+        <AnimatePresence>
+          {disabled && (
+            <motion.div
+              animate={{ opacity: 1, scale: 1 }}
+              className={disabledIconContainer()}
+              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, scale: 0 }}
+            >
+              {disabledIcon}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <span
         className={label()}
         style={{
-          color,
+          color: !disabled ? color : undefined,
         }}
       >
         {decibelsToLabel(decibels)}
