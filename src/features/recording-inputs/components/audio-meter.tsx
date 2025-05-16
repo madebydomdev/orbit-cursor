@@ -48,7 +48,7 @@ const audioMeterVariants = tv({
     orientation: {
       horizontal: {
         base: "flex-row-reverse gap-2 w-full",
-        label: "w-7 text-right",
+        label: "w-[35px] text-center",
       },
       vertical: {
         base: "flex-col gap-0.5",
