@@ -7,7 +7,7 @@ import {
 import { VariantProps } from "tailwind-variants";
 
 import { tv } from "../../../tailwind-merge.config";
-import { focusStyles } from "../../lib/styling";
+import { focusStyles, groupFocus } from "../../lib/styling";
 
 const switchVariants = tv({
   defaultVariants: {
@@ -15,10 +15,11 @@ const switchVariants = tv({
     size: "md",
   },
   slots: {
-    base: "group flex gap-2 items-center text-content-fg",
+    base: "group flex gap-2 items-center text-content-fg outline-none",
     container: [
-      "relative flex cursor-default rounded-full shadow-inner bg-neutral transition-colors items-center border-1 border-content/10",
+      "relative flex cursor-default rounded-full shadow-inner bg-neutral transition-colors items-center border-1 border-neutral/5 transition-all",
       focusStyles,
+      groupFocus,
     ],
     innerLabel:
       "absolute text-black font-black opacity-0 group-data-[selected]:opacity-20 transition-all",
@@ -59,10 +60,8 @@ const sizeToWidth = (
 ): { animate: number; rest: number } => {
   if (size === "md") return { animate: 22, rest: 20 };
   if (size === "xs") return { animate: 15, rest: 13 };
-  return { animate: 25, rest: 20 };
+  return { animate: 22, rest: 20 };
 };
-
-const MotionAriaSwitch = motion.create(AriaSwitch);
 
 const Switch = ({ children, className, size, ...props }: SwitchProps) => {
   const { base, container, innerLabel, thumb } = switchVariants({ size });
@@ -70,21 +69,17 @@ const Switch = ({ children, className, size, ...props }: SwitchProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const { animate, rest } = sizeToWidth(size);
+  // Allows smooth start for animation
+  const width = useMotionValue(rest);
   const thumbAnimations: Variants = {
+    motion: { width: [width.get(), animate, rest] },
     rest: { width: rest },
     tapped: { width: animate },
   };
 
-  // Allows smooth start for animation
-  const width = useMotionValue(rest);
-
   return (
-    <MotionAriaSwitch
-      {...props}
-      className={base({ className })}
-      whileTap="tapped"
-    >
-      {({ isSelected }) => (
+    <AriaSwitch {...props} className={base({ className })}>
+      {({ isPressed, isSelected }) => (
         <>
           {children}
           <motion.div
@@ -94,15 +89,11 @@ const Switch = ({ children, className, size, ...props }: SwitchProps) => {
           >
             <span className={innerLabel()}>ON</span>
             <motion.div
+              animate={isAnimating ? "motion" : isPressed ? "tapped" : "rest"}
               className={thumb()}
               style={{ width }}
               transition={{ duration: 0.2 }}
               variants={thumbAnimations}
-              animate={
-                isAnimating && {
-                  width: [width.get(), animate, rest],
-                }
-              }
               onLayoutAnimationComplete={() => {
                 setIsAnimating(false);
               }}
@@ -114,7 +105,7 @@ const Switch = ({ children, className, size, ...props }: SwitchProps) => {
           </motion.div>
         </>
       )}
-    </MotionAriaSwitch>
+    </AriaSwitch>
   );
 };
 
