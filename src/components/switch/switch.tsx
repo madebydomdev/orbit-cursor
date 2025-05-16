@@ -15,13 +15,13 @@ const switchVariants = tv({
     size: "md",
   },
   slots: {
-    base: "group flex gap-2 items-center text-content-fg font-semibold",
+    base: "group flex gap-2 items-center text-content-fg",
     container: [
       "relative flex cursor-default rounded-full shadow-inner bg-neutral transition-colors items-center border-1 border-content/10",
       focusStyles,
     ],
     innerLabel:
-      "absolute text-xxs left-0.75 text-black opacity-0 group-data-[selected]:opacity-20 transition-all",
+      "absolute text-black font-black opacity-0 group-data-[selected]:opacity-20 transition-all",
     thumb: "rounded-full bg-white shadow-sm shadow-inner z-1",
   },
   variants: {
@@ -34,7 +34,14 @@ const switchVariants = tv({
       md: {
         base: "text-sm",
         container: "h-[26px] w-[46px] p-[3px]",
+        innerLabel: "text-xxs left-0.75",
         thumb: "h-[20px]",
+      },
+      xs: {
+        base: "text-xs",
+        container: "h-[17px] w-[28px] p-[1px]",
+        innerLabel: "text-[4px] left-0.75",
+        thumb: "h-[13px]",
       },
     },
   },
@@ -51,6 +58,7 @@ const sizeToWidth = (
   size: SwitchProps["size"]
 ): { animate: number; rest: number } => {
   if (size === "md") return { animate: 22, rest: 20 };
+  if (size === "xs") return { animate: 15, rest: 13 };
   return { animate: 25, rest: 20 };
 };
 
