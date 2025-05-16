@@ -13,7 +13,7 @@ import {
 import { VariantProps } from "tailwind-variants";
 
 import { tv } from "../../../tailwind-merge.config";
-import { focusStyles } from "../../lib/styling";
+import { elementFocus, focusStyles } from "../../lib/styling";
 import ListBox from "../listbox/listbox";
 
 import ClearButton from "./components/clear-button";
@@ -36,6 +36,7 @@ const selectVariants = tv({
       "shrink inline-flex flex-row items-center justify-between text-content-fg gap-4 rounded-md transition-colors",
       "data-[hovered]:bg-neutral/50",
       focusStyles,
+      elementFocus,
     ],
   },
   variants: {

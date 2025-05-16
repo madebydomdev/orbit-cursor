@@ -7,7 +7,7 @@ import {
 import { VariantProps } from "tailwind-variants";
 
 import { tv } from "../../../tailwind-merge.config";
-import { focusStyles } from "../../lib/styling";
+import { elementFocus, focusStyles } from "../../lib/styling";
 
 const listBoxItemVariants = tv({
   base: [
@@ -15,6 +15,7 @@ const listBoxItemVariants = tv({
     "data-[hovered]:bg-neutral",
     "data-[selected]:[&_svg]:text-success",
     focusStyles,
+    elementFocus,
   ],
   compoundVariants: [
     {

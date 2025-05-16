@@ -6,7 +6,7 @@ import {
 import { VariantProps } from "tailwind-variants";
 
 import { tv } from "../../../../tailwind-merge.config";
-import { focusStyles } from "../../../lib/styling";
+import { elementFocus, focusStyles } from "../../../lib/styling";
 
 const radioVariants = tv({
   slots: {
@@ -14,6 +14,7 @@ const radioVariants = tv({
       "relative flex flex-col grow items-center p-2 rounded-md transition select-none",
       "data-[hovered]:bg-neutral/25",
       focusStyles,
+      elementFocus,
     ],
     bubble: "absolute inset-0 bg-neutral rounded-sm -z-1",
     icon: "text-content-fg",
