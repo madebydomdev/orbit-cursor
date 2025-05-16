@@ -20,6 +20,7 @@ export const PermissionsSchema = z.record(
   PermissionStatusSchema
 );
 
+export type PermissionStatus = z.infer<typeof PermissionStatusSchema>;
 export type Permissions = z.infer<typeof PermissionsSchema>;
 
 type PermissionsState = {
