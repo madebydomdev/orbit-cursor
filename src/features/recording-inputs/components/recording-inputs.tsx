@@ -2,6 +2,7 @@ import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { Mic, Volume2 } from "lucide-react";
 import { useEffect } from "react";
 
+import Separator from "../../../components/separator/separator";
 import {
   PermissionType,
   usePermissionsStore,
@@ -13,11 +14,12 @@ import {
 import { Events } from "../../../types/events";
 
 import AudioSelect from "./audio-select";
+import AudioToggle from "./audio-toggle";
+import GrantAccess from "./grant-access";
 
 const ICON_SIZE = 14;
 
 enum ListBoxes {
-  SystemAudio = "system-audio",
   MicrophoneAudio = "microphone-audio",
 }
 
@@ -43,25 +45,32 @@ const RecordingInputs = () => {
   }, []);
 
   return (
-    <div className="flex flex-row gap-2 px-2.5">
-      <AudioSelect
-        decibels={-15}
-        icon={<Volume2 size={ICON_SIZE} />}
-        id={ListBoxes.SystemAudio}
-        label="System audio"
-        permission={permissions.screen}
-        permissionType={PermissionType.Screen}
-        placeholder="No system audio"
-      />
-      <AudioSelect
-        decibels={-21}
-        icon={<Mic size={ICON_SIZE} />}
-        id={ListBoxes.MicrophoneAudio}
-        label="Microphone audio"
-        permission={permissions.microphone}
-        permissionType={PermissionType.Microphone}
-        placeholder="No microphone"
-      />
+    <div className="flex flex-row px-2">
+      {permissions.microphone?.hasAccess ? (
+        <AudioToggle decibels={-98.9} icon={<Volume2 size={ICON_SIZE} />} />
+      ) : (
+        <GrantAccess
+          permission={permissions.microphone}
+          type={PermissionType.Microphone}
+        />
+      )}
+
+      <Separator className="h-[30px] ml-6" orientation="vertical" spacing="md" />
+
+      {permissions.microphone?.hasAccess ? (
+        <AudioSelect
+          decibels={-21}
+          icon={<Mic size={ICON_SIZE} />}
+          id={ListBoxes.MicrophoneAudio}
+          label="Microphone audio"
+          placeholder="No microphone"
+        />
+      ) : (
+        <GrantAccess
+          permission={permissions.microphone}
+          type={PermissionType.Microphone}
+        />
+      )}
     </div>
   );
 };

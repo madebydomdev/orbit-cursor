@@ -5,12 +5,13 @@ import { Button as AriaButton } from "react-aria-components";
 import { VariantProps } from "tailwind-variants";
 
 import { tv } from "../../../tailwind-merge.config";
-import { focusStyles } from "../../lib/styling";
+import { elementFocus, focusStyles } from "../../lib/styling";
 
 const buttonVariants = tv({
   base: [
     "inline-flex items-center gap-2 rounded-md font-semibold transition",
     focusStyles,
+    elementFocus,
   ],
   compoundVariants: [
     {
