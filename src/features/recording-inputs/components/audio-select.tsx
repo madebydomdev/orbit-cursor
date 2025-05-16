@@ -3,15 +3,8 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 
-import {
-  openSystemSettings,
-  requestPermissions,
-} from "../../../api/permissions";
-import Button from "../../../components/button/button";
 import ListBoxItem from "../../../components/listbox-item/listbox-item";
 import Select from "../../../components/select/select";
-import { cn } from "../../../lib/styling";
-import { PermissionType } from "../../../stores/permissions.store";
 import {
   SelectedItem,
   useStandaloneListBoxStore,
@@ -24,13 +17,6 @@ type AudioSelectProps = {
   decibels: number | undefined;
   id: string;
   label: string;
-  permission:
-    | {
-        canRequest: boolean;
-        hasAccess: boolean;
-      }
-    | undefined;
-  permissionType: PermissionType;
   placeholder: string;
   icon?: React.ReactNode;
 };
@@ -39,8 +25,6 @@ const AudioSelect = ({
   icon,
   id,
   label,
-  permission,
-  permissionType,
   placeholder,
 }: AudioSelectProps) => {
   const [openListBoxId, openListBox, addListBox, setSelectedItems] =
@@ -83,76 +67,54 @@ const AudioSelect = ({
     return selectedItems[0].id;
   };
 
-  const onPressGrant = () => {
-    if (permission?.canRequest) requestPermissions(permissionType);
-    else openSystemSettings();
-  };
-
   useEffect(() => {
     addListBox(id, label);
   }, []);
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-1 w-full",
-        !permission?.hasAccess && "justify-center items-center bg-neutral/15"
-      )}
-    >
-      {!permission?.hasAccess && (
-        <Button onPress={onPressGrant} size="sm">
-          {icon} {permission?.canRequest ? "Grant" : "System Settings"}
-        </Button>
-      )}
+    <div className="flex flex-col gap-1 grow basis-0">
+      <Select
+        aria-label={label}
+        className="w-full"
+        clearable={listBox?.selectedItems && listBox.selectedItems.length > 0}
+        isOpen={openListBoxId === id}
+        items={listBox?.selectedItems ?? []}
+        leftSection={icon}
+        placeholder={placeholder}
+        selectedKey={listBox ? selectedItem(listBox.selectedItems) : null}
+        size="sm"
+        triggerRef={triggerRef}
+        variant="ghost"
+        onClear={() => {
+          setSelectedItems(id, []);
+        }}
+        onPress={() => {
+          if (openListBoxId !== id) {
+            void openStandaloneListBox();
+          }
+        }}
+        standalone
+      >
+        {
+          // Although not rendered we need this for Select to show the selected item
+          listBox?.selectedItems.map((item) => (
+            <ListBoxItem
+              key={item.id}
+              id={item.id ?? undefined}
+              textValue={item.label}
+            >
+              {item.label}
+            </ListBoxItem>
+          ))
+        }
+      </Select>
 
-      {permission?.hasAccess && (
-        <>
-          <Select
-            aria-label={label}
-            className="w-full"
-            isOpen={openListBoxId === id}
-            items={listBox?.selectedItems ?? []}
-            leftSection={icon}
-            placeholder={placeholder}
-            selectedKey={listBox ? selectedItem(listBox.selectedItems) : null}
-            size="sm"
-            triggerRef={triggerRef}
-            variant="ghost"
-            clearable={
-              listBox?.selectedItems && listBox.selectedItems.length > 0
-            }
-            onClear={() => {
-              setSelectedItems(id, []);
-            }}
-            onPress={() => {
-              if (openListBoxId !== id) {
-                void openStandaloneListBox();
-              }
-            }}
-            standalone
-          >
-            {
-              // Although not rendered we need this for Select to show the selected item
-              listBox?.selectedItems.map((item) => (
-                <ListBoxItem
-                  key={item.id}
-                  id={item.id ?? undefined}
-                  textValue={item.label}
-                >
-                  {item.label}
-                </ListBoxItem>
-              ))
-            }
-          </Select>
-
-          <AudioMeter
-            decibels={decibels ?? -Infinity}
-            height={5}
-            orientation="horizontal"
-            width="100%"
-          />
-        </>
-      )}
+      <AudioMeter
+        decibels={decibels ?? -Infinity}
+        height={5}
+        orientation="horizontal"
+        width="100%"
+      />
     </div>
   );
 };
